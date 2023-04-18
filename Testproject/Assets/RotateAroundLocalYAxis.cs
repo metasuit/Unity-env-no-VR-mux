@@ -221,6 +221,10 @@ public class RotateAroundLocalYAxis : MonoBehaviour
             for (int i = 0; i < 3; i++)
             {
                 floatValues[i] = float.Parse(values[i]);
+                if(calibrationVoltage1 - calibrationVoltage2 == 0)
+                {
+                    throw new DivideByZeroException("Calibration voltage 1 is equal to calibration voltage 2. Division by zero is not allowed.");
+                }
                 vectorRotation += ((floatValues[i] - calibrationVoltage1) / (calibrationVoltage2 - calibrationVoltage1)) * (calibrationAngle2 - calibrationAngle1) + calibrationAngle1;
             }
             vectorRotation /= 3;

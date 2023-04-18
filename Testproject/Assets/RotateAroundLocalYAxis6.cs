@@ -190,7 +190,12 @@ public class RotateAroundLocalYAxis6 : MonoBehaviour
             //Get values 3-5
             float floatValues = float.Parse(values[6]);
             //Debug.Log("floatValues " + floatValues);
-            //Debug.Log("vectorRotation: " + ((floatValues - calibrationVoltage1) / (calibrationVoltage2 - calibrationVoltage1)));           
+            //Debug.Log("vectorRotation: " + ((floatValues - calibrationVoltage1) / (calibrationVoltage2 - calibrationVoltage1)));
+            //if(calibrationVoltage1 - calibrationVoltage2 == 0)
+            if (calibrationVoltage1 - calibrationVoltage2 == 0)
+            {
+                throw new DivideByZeroException("Calibration voltage 1 is equal to calibration voltage 2. Division by zero is not allowed.");
+            }
             float vectorRotation = ((floatValues - calibrationVoltage1) / (calibrationVoltage2 - calibrationVoltage1)) * (calibrationAngle2 - calibrationAngle1) + calibrationAngle1;
             Debug.Log("vectorRotation:" + vectorRotation.ToString());
             Vector3 to = new Vector3(0, vectorRotation, 0);
