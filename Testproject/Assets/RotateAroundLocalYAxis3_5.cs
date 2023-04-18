@@ -14,6 +14,7 @@ public class RotateAroundLocalYAxis3_5 : MonoBehaviour
     string path = @"c:\tmp\MyTest.txt";
     string measuredValue;
     bool calibrated = false;
+    bool torso_calibration_active = false;
     float calibrationAngleSlider = 0.5f;
     float calibrationAngle1 = 90;
     float calibrationAngle2 = 0;
@@ -27,7 +28,8 @@ public class RotateAroundLocalYAxis3_5 : MonoBehaviour
     public Button calibrateButton1;
     public Button calibrateButton2;
     public Slider calibrationSlider;
-    public Button startCalibrationButton;
+    public Button startLegsCalibrationButton;
+    public Button startTorsoCalibrationButton;
     public Button startApplicationButton;
 
     private void Start()
@@ -35,8 +37,9 @@ public class RotateAroundLocalYAxis3_5 : MonoBehaviour
 
         calibrateButton1.onClick.AddListener(ButtonClick1);
         calibrateButton2.onClick.AddListener(ButtonClick2);
-        startCalibrationButton.onClick.AddListener(StartCalibration);
+        startLegsCalibrationButton.onClick.AddListener(StartCalibration);
         startApplicationButton.onClick.AddListener(EndCalibration);
+        startTorsoCalibrationButton.onClick.AddListener(TorsoCalibrationActive);
     }
     void StartCalibration()
     {
@@ -45,6 +48,7 @@ public class RotateAroundLocalYAxis3_5 : MonoBehaviour
     void EndCalibration()
     {
         calibrated = true;
+        torso_calibration_active = false;
     }
     void ButtonClick1()
     {
@@ -55,9 +59,14 @@ public class RotateAroundLocalYAxis3_5 : MonoBehaviour
         StartCoroutine(CalibratePos2());
     }
 
+    void TorsoCalibrationActive()
+    {
+        torso_calibration_active = true;
+    }
+
     IEnumerator CalibratePos1()
     {
-        if (calibrated == false)
+        if (calibrated == false && !torso_calibration_active)
         {
 
             float endTime = Time.time + calibrationTime;
@@ -107,7 +116,7 @@ public class RotateAroundLocalYAxis3_5 : MonoBehaviour
 
     IEnumerator CalibratePos2()
     {
-        if (calibrated == false)
+        if (calibrated == false && !torso_calibration_active)
         {
 
             float endTime = Time.time + calibrationTime;
@@ -156,7 +165,7 @@ public class RotateAroundLocalYAxis3_5 : MonoBehaviour
 
     public void RotationUpdate(System.Single value)
     {
-        if (calibrated == false)
+        if (calibrated == false && !torso_calibration_active)
         {
 
             Vector3 to = new Vector3(0, value, 0);
@@ -200,7 +209,7 @@ public class RotateAroundLocalYAxis3_5 : MonoBehaviour
 
             transform.localEulerAngles = to;
         }
-        if (calibrated == true)
+        if (calibrated == true && !torso_calibration_active)
         {
             using (var fileStream = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
             {

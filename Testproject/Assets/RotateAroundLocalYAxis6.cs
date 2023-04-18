@@ -14,6 +14,8 @@ public class RotateAroundLocalYAxis6 : MonoBehaviour
     string path = @"c:\tmp\MyTest.txt";
     string measuredValue;
     bool calibrated = false;
+    bool legs_calibration_active = true;
+
     float calibrationAngleSlider = 0.5f;
     float calibrationAngle1 = 90;
     float calibrationAngle2 = 0;
@@ -27,21 +29,25 @@ public class RotateAroundLocalYAxis6 : MonoBehaviour
     public Button calibrateButton1;
     public Button calibrateButton2;
     public Slider calibrationSlider;
-    public Button startCalibrationButton;
+    public Button startTorsoCalibrationButton;
     public Button startApplicationButton;
+    public Button startLegCalibrationButton;
 
     private void Start()
     {
 
         calibrateButton1.onClick.AddListener(ButtonClick1);
         calibrateButton2.onClick.AddListener(ButtonClick2);
-        startCalibrationButton.onClick.AddListener(StartCalibration);
+        startLegCalibrationButton.onClick.AddListener(LegCalibrationActive);
+        startTorsoCalibrationButton.onClick.AddListener(StartCalibration);
         startApplicationButton.onClick.AddListener(EndCalibration);
+        
         
     }
     void StartCalibration()
     {
         calibrated = false;
+        legs_calibration_active = false;
     }
     void EndCalibration()
     {
@@ -56,9 +62,14 @@ public class RotateAroundLocalYAxis6 : MonoBehaviour
         StartCoroutine(CalibratePos2());
     }
 
+    void LegCalibrationActive()
+    {
+        legs_calibration_active = true;
+    }
+
     IEnumerator CalibratePos1()
     {
-        if (calibrated == false)
+        if (calibrated == false && !legs_calibration_active)
         {
 
             float endTime = Time.time + calibrationTime;
@@ -96,7 +107,7 @@ public class RotateAroundLocalYAxis6 : MonoBehaviour
 
     IEnumerator CalibratePos2()
     {
-        if (calibrated == false)
+        if (calibrated == false && !legs_calibration_active)
         {
 
             float endTime = Time.time + calibrationTime;           
@@ -134,7 +145,7 @@ public class RotateAroundLocalYAxis6 : MonoBehaviour
 
     public void RotationUpdate(System.Single value)
     {
-        if (calibrated == false)
+        if (calibrated == false && !legs_calibration_active)
         {
 
             Vector3 to = new Vector3(0, value, 0);
@@ -173,7 +184,7 @@ public class RotateAroundLocalYAxis6 : MonoBehaviour
 
             transform.localEulerAngles = to;
         }
-        if (calibrated == true)
+        if (calibrated == true && !legs_calibration_active)
         {
             using (var fileStream = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
             {
