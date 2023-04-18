@@ -9,7 +9,7 @@ using System.IO;
 using System.Text;
 using Button = UnityEngine.UI.Button;
 
-public class RotateAroundLocalYAxis : MonoBehaviour
+public class RotateAroundLocalYAxis6 : MonoBehaviour
 {
     string path = @"c:\tmp\MyTest.txt";
     string measuredValue;
@@ -28,10 +28,10 @@ public class RotateAroundLocalYAxis : MonoBehaviour
     public Button calibrateButton2;
     public Slider calibrationSlider;
     public Button startCalibrationButton;
-    
+
     private void Start()
     {
-       
+
         calibrateButton1.onClick.AddListener(ButtonClick1);
         calibrateButton2.onClick.AddListener(ButtonClick2);
         startCalibrationButton.onClick.AddListener(StartCalibration);
@@ -59,12 +59,7 @@ public class RotateAroundLocalYAxis : MonoBehaviour
         {
 
             float endTime = Time.time + calibrationTime;
-            List<double>[] calibrationValuesLists = new List<double>[3]; // array of seven lists
-            float[] calibrationVoltagesPos1 = new float[7]; // array of 3 calibration voltages
-            for (int i = 0; i < 3; i++)
-            {
-                calibrationValuesLists[i] = new List<double>(); // initialize each list
-            }
+            List<double> calibrationValuesList = new List<double>();
 
             while (Time.time < endTime)
             {
@@ -79,24 +74,16 @@ public class RotateAroundLocalYAxis : MonoBehaviour
                         byte[] test = memoryStream.ToArray();
                         string[] values = System.Text.Encoding.Default.GetString(test).Split(','); // split the string into an array of 7 values
 
-                        for (int i = 0; i < 3; i++)
-                        {
-                            double value = double.Parse(values[i]);
-                            calibrationValuesLists[i].Add(value); // add the value to the corresponding list
-                            //Debug.Log("Value " + (i + 1) + ": " + value);
-                        }
+                        double value = double.Parse(values[6]);
+                        calibrationValuesList.Add(value);
+                        //Debug.Log("Value " + ": " + value);
                     }
                 }
 
                 yield return null;
             }
-            // calculate the calibration voltages for each list
-            for (int i = 0; i < 3; i++)
-            {
-                calibrationVoltagesPos1[i] = Convert.ToSingle(calibrationValuesLists[i].Average());
-                //Debug.Log("Calibration voltage " + (i + 1) + ": " + calibrationVoltagesPos1[i]);
-            }
-            calibrationVoltage1 = calibrationVoltagesPos1.Average();
+            // calculate the calibration voltages
+            calibrationVoltage1 = Convert.ToSingle(calibrationValuesList.Average());
             Debug.Log("Calibration Voltage Pos 1: " + calibrationVoltage1);
             Debug.Log("Calibration Pos1 finished.");
         }
@@ -107,13 +94,8 @@ public class RotateAroundLocalYAxis : MonoBehaviour
         if (calibrated == false)
         {
 
-            float endTime = Time.time + calibrationTime;
-            List<double>[] calibrationValuesLists = new List<double>[3]; // array of seven lists
-            float[] calibrationVoltagesPos2 = new float[3]; // array of seven calibration voltages
-            for (int i = 0; i < 3; i++)
-            {
-                calibrationValuesLists[i] = new List<double>(); // initialize each list
-            }
+            float endTime = Time.time + calibrationTime;           
+            List<double> calibrationValuesList = new List<double>(); // List of calibration values 6
 
             while (Time.time < endTime)
             {
@@ -127,23 +109,17 @@ public class RotateAroundLocalYAxis : MonoBehaviour
                         fileStream.CopyTo(memoryStream);
                         byte[] test = memoryStream.ToArray();
                         string[] values = System.Text.Encoding.Default.GetString(test).Split(','); // split the string into an array of values
-                        for (int i = 0; i < 3; i++)
-                        {
-                            double value = double.Parse(values[i]);
-                            calibrationValuesLists[i].Add(value); // add the value to the corresponding list
-                            //Debug.Log("Value " + (i + 1) + ": " + value);
-                        }
+
+                        double value = double.Parse(values[6]);
+                        calibrationValuesList.Add(value);
+                        //Debug.Log("Value " + ": " + value);
                     }
                 }
 
                 yield return null;
             }
-            for (int i = 0; i < 3; i++)
-            {
-                calibrationVoltagesPos2[i] = Convert.ToSingle(calibrationValuesLists[i].Average());
-                //Debug.Log("Calibration voltage " + (i + 1) + ": " + calibrationVoltagesPos1[i]);
-            }
-            calibrationVoltage2 = calibrationVoltagesPos2.Average();
+            // calculate the calibration voltages
+            calibrationVoltage2 = Convert.ToSingle(calibrationValuesList.Average());
             Debug.Log("Calibration Voltage Pos 2: " + calibrationVoltage2);
             Debug.Log("Calibration Pos2 finished.");
         }
@@ -154,7 +130,7 @@ public class RotateAroundLocalYAxis : MonoBehaviour
     {
         if (calibrated == false)
         {
-            
+
             Vector3 to = new Vector3(0, value, 0);
 
             transform.localEulerAngles = to;
@@ -180,23 +156,17 @@ public class RotateAroundLocalYAxis : MonoBehaviour
             }
             // Split the string into 7 values and parse them to floats
             string[] values = measuredValue.Split(',');
-            float[] floatValues = new float[3];
-            float vectorRotation = 0;
 
-            //Get first 3 values
-            for (int i = 0; i < 3; i++)
-            {
-                floatValues[i] = float.Parse(values[i]);
-                vectorRotation += (floatValues[i] - voltageOffsetEstim) * voltagetoDegEstim;
-            }
-            vectorRotation /= 3;
-            
+            float floatValues = float.Parse(values[6]);
+            float vectorRotation = (floatValues - voltageOffsetEstim) * voltagetoDegEstim;
+
+
             Debug.Log(vectorRotation.ToString());
             Vector3 to = new Vector3(0, vectorRotation, 0);
 
             transform.localEulerAngles = to;
         }
-        if(calibrated==true)
+        if (calibrated == true)
         {
             using (var fileStream = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
             {
@@ -209,22 +179,15 @@ public class RotateAroundLocalYAxis : MonoBehaviour
                 }
             }
             string[] values = measuredValue.Split(',');
-            float[] floatValues = new float[3];
-            float vectorRotation = 0;
-            //Get first 3 values
-            for (int i = 0; i < 3; i++)
-            {
-                floatValues[i] = float.Parse(values[i]);
-                vectorRotation += ((floatValues[i] - calibrationVoltage1) / (calibrationVoltage2 - calibrationVoltage1)) * (calibrationAngle2 - calibrationAngle1) + calibrationAngle1;
-            }
-            vectorRotation /= 3;
+            //Get values 3-5
+            float floatValues = float.Parse(values[6]);
+            float vectorRotation = ((floatValues - calibrationVoltage1) / (calibrationVoltage2 - calibrationVoltage1)) * (calibrationAngle2 - calibrationAngle1) + calibrationAngle1;
             Debug.Log(vectorRotation.ToString());
             Vector3 to = new Vector3(0, vectorRotation, 0);
 
             transform.localEulerAngles = to;
-            
-        }
-       
-    }
 
+        }
+
+    }
 }

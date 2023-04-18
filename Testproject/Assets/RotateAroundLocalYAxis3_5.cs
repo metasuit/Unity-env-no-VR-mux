@@ -9,7 +9,7 @@ using System.IO;
 using System.Text;
 using Button = UnityEngine.UI.Button;
 
-public class RotateAroundLocalYAxis : MonoBehaviour
+public class RotateAroundLocalYAxis3_5 : MonoBehaviour
 {
     string path = @"c:\tmp\MyTest.txt";
     string measuredValue;
@@ -28,10 +28,10 @@ public class RotateAroundLocalYAxis : MonoBehaviour
     public Button calibrateButton2;
     public Slider calibrationSlider;
     public Button startCalibrationButton;
-    
+
     private void Start()
     {
-       
+
         calibrateButton1.onClick.AddListener(ButtonClick1);
         calibrateButton2.onClick.AddListener(ButtonClick2);
         startCalibrationButton.onClick.AddListener(StartCalibration);
@@ -60,7 +60,7 @@ public class RotateAroundLocalYAxis : MonoBehaviour
 
             float endTime = Time.time + calibrationTime;
             List<double>[] calibrationValuesLists = new List<double>[3]; // array of seven lists
-            float[] calibrationVoltagesPos1 = new float[7]; // array of 3 calibration voltages
+            float[] calibrationVoltagesPos1 = new float[7]; // array of 3 calibration voltages (3-5)
             for (int i = 0; i < 3; i++)
             {
                 calibrationValuesLists[i] = new List<double>(); // initialize each list
@@ -79,9 +79,9 @@ public class RotateAroundLocalYAxis : MonoBehaviour
                         byte[] test = memoryStream.ToArray();
                         string[] values = System.Text.Encoding.Default.GetString(test).Split(','); // split the string into an array of 7 values
 
-                        for (int i = 0; i < 3; i++)
+                        for (int i = 0; i < 3; i++) // Get elements 3-5
                         {
-                            double value = double.Parse(values[i]);
+                            double value = double.Parse(values[i + 3]); //offset for values 3-5
                             calibrationValuesLists[i].Add(value); // add the value to the corresponding list
                             //Debug.Log("Value " + (i + 1) + ": " + value);
                         }
@@ -129,7 +129,7 @@ public class RotateAroundLocalYAxis : MonoBehaviour
                         string[] values = System.Text.Encoding.Default.GetString(test).Split(','); // split the string into an array of values
                         for (int i = 0; i < 3; i++)
                         {
-                            double value = double.Parse(values[i]);
+                            double value = double.Parse(values[i + 3]); //offset for values 3-5
                             calibrationValuesLists[i].Add(value); // add the value to the corresponding list
                             //Debug.Log("Value " + (i + 1) + ": " + value);
                         }
@@ -154,7 +154,7 @@ public class RotateAroundLocalYAxis : MonoBehaviour
     {
         if (calibrated == false)
         {
-            
+
             Vector3 to = new Vector3(0, value, 0);
 
             transform.localEulerAngles = to;
@@ -183,20 +183,20 @@ public class RotateAroundLocalYAxis : MonoBehaviour
             float[] floatValues = new float[3];
             float vectorRotation = 0;
 
-            //Get first 3 values
+
             for (int i = 0; i < 3; i++)
             {
                 floatValues[i] = float.Parse(values[i]);
                 vectorRotation += (floatValues[i] - voltageOffsetEstim) * voltagetoDegEstim;
             }
             vectorRotation /= 3;
-            
+
             Debug.Log(vectorRotation.ToString());
             Vector3 to = new Vector3(0, vectorRotation, 0);
 
             transform.localEulerAngles = to;
         }
-        if(calibrated==true)
+        if (calibrated == true)
         {
             using (var fileStream = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
             {
@@ -211,10 +211,10 @@ public class RotateAroundLocalYAxis : MonoBehaviour
             string[] values = measuredValue.Split(',');
             float[] floatValues = new float[3];
             float vectorRotation = 0;
-            //Get first 3 values
+            //Get values 3-5
             for (int i = 0; i < 3; i++)
             {
-                floatValues[i] = float.Parse(values[i]);
+                floatValues[i] = float.Parse(values[i + 3]); //+3 -> offset values 3-6
                 vectorRotation += ((floatValues[i] - calibrationVoltage1) / (calibrationVoltage2 - calibrationVoltage1)) * (calibrationAngle2 - calibrationAngle1) + calibrationAngle1;
             }
             vectorRotation /= 3;
@@ -222,9 +222,9 @@ public class RotateAroundLocalYAxis : MonoBehaviour
             Vector3 to = new Vector3(0, vectorRotation, 0);
 
             transform.localEulerAngles = to;
-            
+
         }
-       
+
     }
 
 }
