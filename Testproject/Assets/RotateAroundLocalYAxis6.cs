@@ -100,6 +100,7 @@ public class RotateAroundLocalYAxis6 : MonoBehaviour
             }
             // calculate the calibration voltages
             calibrationVoltage1 = Convert.ToSingle(calibrationValuesList.Average());
+            //calibrationVoltage1 = Convert.ToSingle(calibrationValuesList.Min());
             Debug.Log("Calibration Voltage Pos 1: " + calibrationVoltage1);
             Debug.Log("Calibration Pos1 finished.");
         }
@@ -137,6 +138,7 @@ public class RotateAroundLocalYAxis6 : MonoBehaviour
             }
             // calculate the calibration voltages
             calibrationVoltage2 = Convert.ToSingle(calibrationValuesList.Average());
+            //calibrationVoltage2 = Convert.ToSingle(calibrationValuesList.Max());
             Debug.Log("Calibration Voltage Pos 2: " + calibrationVoltage2);
             Debug.Log("Calibration Pos2 finished.");
         }
