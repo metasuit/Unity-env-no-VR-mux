@@ -28,6 +28,7 @@ public class RotateAroundLocalYAxis3_5 : MonoBehaviour
     public Button calibrateButton2;
     public Slider calibrationSlider;
     public Button startCalibrationButton;
+    public Button startApplicationButton;
 
     private void Start()
     {
@@ -35,6 +36,7 @@ public class RotateAroundLocalYAxis3_5 : MonoBehaviour
         calibrateButton1.onClick.AddListener(ButtonClick1);
         calibrateButton2.onClick.AddListener(ButtonClick2);
         startCalibrationButton.onClick.AddListener(StartCalibration);
+        startApplicationButton.onClick.AddListener(EndCalibration);
     }
     void StartCalibration()
     {
@@ -60,7 +62,7 @@ public class RotateAroundLocalYAxis3_5 : MonoBehaviour
 
             float endTime = Time.time + calibrationTime;
             List<double>[] calibrationValuesLists = new List<double>[3]; // array of seven lists
-            float[] calibrationVoltagesPos1 = new float[7]; // array of 3 calibration voltages (3-5)
+            float[] calibrationVoltagesPos1 = new float[3]; // array of 3 calibration voltages (3-5)
             for (int i = 0; i < 3; i++)
             {
                 calibrationValuesLists[i] = new List<double>(); // initialize each list
@@ -78,6 +80,7 @@ public class RotateAroundLocalYAxis3_5 : MonoBehaviour
                         fileStream.CopyTo(memoryStream);
                         byte[] test = memoryStream.ToArray();
                         string[] values = System.Text.Encoding.Default.GetString(test).Split(','); // split the string into an array of 7 values
+                        //string[] values = System.Text.Encoding.Default.GetString(test).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim()).ToArray();
 
                         for (int i = 0; i < 3; i++) // Get elements 3-5
                         {
@@ -127,6 +130,7 @@ public class RotateAroundLocalYAxis3_5 : MonoBehaviour
                         fileStream.CopyTo(memoryStream);
                         byte[] test = memoryStream.ToArray();
                         string[] values = System.Text.Encoding.Default.GetString(test).Split(','); // split the string into an array of values
+                        //string[] values = System.Text.Encoding.Default.GetString(test).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim()).ToArray();
                         for (int i = 0; i < 3; i++)
                         {
                             double value = double.Parse(values[i + 3]); //offset for values 3-5
@@ -205,7 +209,7 @@ public class RotateAroundLocalYAxis3_5 : MonoBehaviour
                     fileStream.CopyTo(memoryStream);
                     byte[] test = memoryStream.ToArray();
                     measuredValue = System.Text.Encoding.Default.GetString(test);
-                    Debug.Log((float.Parse(measuredValue) * 100).ToString());
+                    //Debug.Log((float.Parse(measuredValue) * 100).ToString());
                 }
             }
             string[] values = measuredValue.Split(',');

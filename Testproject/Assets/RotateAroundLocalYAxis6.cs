@@ -28,6 +28,7 @@ public class RotateAroundLocalYAxis6 : MonoBehaviour
     public Button calibrateButton2;
     public Slider calibrationSlider;
     public Button startCalibrationButton;
+    public Button startApplicationButton;
 
     private void Start()
     {
@@ -35,6 +36,8 @@ public class RotateAroundLocalYAxis6 : MonoBehaviour
         calibrateButton1.onClick.AddListener(ButtonClick1);
         calibrateButton2.onClick.AddListener(ButtonClick2);
         startCalibrationButton.onClick.AddListener(StartCalibration);
+        startApplicationButton.onClick.AddListener(EndCalibration);
+        
     }
     void StartCalibration()
     {
@@ -73,10 +76,12 @@ public class RotateAroundLocalYAxis6 : MonoBehaviour
                         fileStream.CopyTo(memoryStream);
                         byte[] test = memoryStream.ToArray();
                         string[] values = System.Text.Encoding.Default.GetString(test).Split(','); // split the string into an array of 7 values
+                        //string[] values = System.Text.Encoding.Default.GetString(test).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim()).ToArray();
+                        Debug.Log(values);
 
                         double value = double.Parse(values[6]);
                         calibrationValuesList.Add(value);
-                        //Debug.Log("Value " + ": " + value);
+                        Debug.Log("Value " + ": " + value);
                     }
                 }
 
@@ -109,10 +114,11 @@ public class RotateAroundLocalYAxis6 : MonoBehaviour
                         fileStream.CopyTo(memoryStream);
                         byte[] test = memoryStream.ToArray();
                         string[] values = System.Text.Encoding.Default.GetString(test).Split(','); // split the string into an array of values
+                        //string[] values = System.Text.Encoding.Default.GetString(test).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim()).ToArray();
 
                         double value = double.Parse(values[6]);
                         calibrationValuesList.Add(value);
-                        //Debug.Log("Value " + ": " + value);
+                        Debug.Log("Value " + ": " + value);
                     }
                 }
 
@@ -152,6 +158,7 @@ public class RotateAroundLocalYAxis6 : MonoBehaviour
                     fileStream.CopyTo(memoryStream);
                     byte[] test = memoryStream.ToArray();
                     measuredValue = System.Text.Encoding.Default.GetString(test);
+                    //string[] values = System.Text.Encoding.Default.GetString(test).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim()).ToArray();
                 }
             }
             // Split the string into 7 values and parse them to floats
@@ -175,14 +182,17 @@ public class RotateAroundLocalYAxis6 : MonoBehaviour
                     fileStream.CopyTo(memoryStream);
                     byte[] test = memoryStream.ToArray();
                     measuredValue = System.Text.Encoding.Default.GetString(test);
-                    Debug.Log((float.Parse(measuredValue) * 100).ToString());
+                    //Debug.Log((float.Parse(measuredValue) * 100).ToString());
+                    //string[] values = System.Text.Encoding.Default.GetString(test).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim()).ToArray();
                 }
             }
             string[] values = measuredValue.Split(',');
             //Get values 3-5
             float floatValues = float.Parse(values[6]);
+            //Debug.Log("floatValues " + floatValues);
+            //Debug.Log("vectorRotation: " + ((floatValues - calibrationVoltage1) / (calibrationVoltage2 - calibrationVoltage1)));           
             float vectorRotation = ((floatValues - calibrationVoltage1) / (calibrationVoltage2 - calibrationVoltage1)) * (calibrationAngle2 - calibrationAngle1) + calibrationAngle1;
-            Debug.Log(vectorRotation.ToString());
+            Debug.Log("vectorRotation:" + vectorRotation.ToString());
             Vector3 to = new Vector3(0, vectorRotation, 0);
 
             transform.localEulerAngles = to;
