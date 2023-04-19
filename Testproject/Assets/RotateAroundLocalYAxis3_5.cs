@@ -11,7 +11,6 @@ using Button = UnityEngine.UI.Button;
 
 public class RotateAroundLocalYAxis3_5 : MonoBehaviour
 {
-    string path = @"c:\tmp\MyTest.txt";
     string measuredValue;
     bool calibrated = false;
     bool torso_calibration_active = false;
@@ -31,6 +30,7 @@ public class RotateAroundLocalYAxis3_5 : MonoBehaviour
     public Button startLegsCalibrationButton;
     public Button startTorsoCalibrationButton;
     public Button startApplicationButton;
+    public DataProcessor dataProcessor;
 
     private void Start()
     {
@@ -82,22 +82,11 @@ public class RotateAroundLocalYAxis3_5 : MonoBehaviour
                 Debug.Log("Running concurrent task...");
 
                 //
-                using (var fileStream = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+                // Get filtered values                
+                for (int i = 0; i < 3; i++)
                 {
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        fileStream.CopyTo(memoryStream);
-                        byte[] test = memoryStream.ToArray();
-                        string[] values = System.Text.Encoding.Default.GetString(test).Split(','); // split the string into an array of 7 values
-                        //string[] values = System.Text.Encoding.Default.GetString(test).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim()).ToArray();
-
-                        for (int i = 0; i < 3; i++) // Get elements 3-5
-                        {
-                            double value = double.Parse(values[i + 3]); //offset for values 3-5
-                            calibrationValuesLists[i].Add(value); // add the value to the corresponding list
-                            //Debug.Log("Value " + (i + 1) + ": " + value);
-                        }
-                    }
+                    double filteredValue = dataProcessor.GetFilteredValue(i + 3);
+                    calibrationValuesLists[i].Add(filteredValue); // add the value to the corresponding list
                 }
 
                 yield return null;
@@ -131,22 +120,11 @@ public class RotateAroundLocalYAxis3_5 : MonoBehaviour
             {
                 Debug.Log("Running concurrent task...");
 
-                //
-                using (var fileStream = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
+                // Get filtered values                
+                for (int i = 0; i < 3; i++)
                 {
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        fileStream.CopyTo(memoryStream);
-                        byte[] test = memoryStream.ToArray();
-                        string[] values = System.Text.Encoding.Default.GetString(test).Split(','); // split the string into an array of values
-                        //string[] values = System.Text.Encoding.Default.GetString(test).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim()).ToArray();
-                        for (int i = 0; i < 3; i++)
-                        {
-                            double value = double.Parse(values[i + 3]); //offset for values 3-5
-                            calibrationValuesLists[i].Add(value); // add the value to the corresponding list
-                            //Debug.Log("Value " + (i + 1) + ": " + value);
-                        }
-                    }
+                    double filteredValue = dataProcessor.GetFilteredValue(i + 3);
+                    calibrationValuesLists[i].Add(filteredValue); // add the value to the corresponding list
                 }
 
                 yield return null;
@@ -182,24 +160,13 @@ public class RotateAroundLocalYAxis3_5 : MonoBehaviour
 
         if (selfsensingTesting == true)
         {
-            using (var fileStream = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
-            {
-                using (var memoryStream = new MemoryStream())
-                {
-                    fileStream.CopyTo(memoryStream);
-                    byte[] test = memoryStream.ToArray();
-                    measuredValue = System.Text.Encoding.Default.GetString(test);
-                }
-            }
-            // Split the string into 7 values and parse them to floats
-            string[] values = measuredValue.Split(',');
             float[] floatValues = new float[3];
             float vectorRotation = 0;
 
 
             for (int i = 0; i < 3; i++)
             {
-                floatValues[i] = float.Parse(values[i]);
+                floatValues[i] = (float)dataProcessor.GetFilteredValue(i + 3);
                 vectorRotation += (floatValues[i] - voltageOffsetEstim) * voltagetoDegEstim;
             }
             vectorRotation /= 3;
@@ -211,23 +178,12 @@ public class RotateAroundLocalYAxis3_5 : MonoBehaviour
         }
         if (calibrated == true && !torso_calibration_active)
         {
-            using (var fileStream = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
-            {
-                using (var memoryStream = new MemoryStream())
-                {
-                    fileStream.CopyTo(memoryStream);
-                    byte[] test = memoryStream.ToArray();
-                    measuredValue = System.Text.Encoding.Default.GetString(test);
-                    //Debug.Log((float.Parse(measuredValue) * 100).ToString());
-                }
-            }
-            string[] values = measuredValue.Split(',');
             float[] floatValues = new float[3];
             float vectorRotation = 0;
             //Get values 3-5
             for (int i = 0; i < 3; i++)
             {
-                floatValues[i] = float.Parse(values[i + 3]); //+3 -> offset values 3-6
+                floatValues[i] = (float)dataProcessor.GetFilteredValue(i + 3); //+3 -> offset values 3-6
                 if (calibrationVoltage1 - calibrationVoltage2 == 0)
                 {
                     throw new DivideByZeroException("Calibration voltage 1 is equal to calibration voltage 2. Division by zero is not allowed.");

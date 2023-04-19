@@ -11,7 +11,6 @@ using Button = UnityEngine.UI.Button;
 
 public class RotateAroundLocalYAxis6 : MonoBehaviour
 {
-    string path = @"c:\tmp\MyTest.txt";
     string measuredValue;
     bool calibrated = false;
     bool legs_calibration_active = true;
@@ -32,6 +31,7 @@ public class RotateAroundLocalYAxis6 : MonoBehaviour
     public Button startTorsoCalibrationButton;
     public Button startApplicationButton;
     public Button startLegCalibrationButton;
+    public DataProcessor dataProcessor;
 
     private void Start()
     {
@@ -79,23 +79,10 @@ public class RotateAroundLocalYAxis6 : MonoBehaviour
             {
                 Debug.Log("Running concurrent task...");
 
-                //
-                using (var fileStream = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
-                {
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        fileStream.CopyTo(memoryStream);
-                        byte[] test = memoryStream.ToArray();
-                        string[] values = System.Text.Encoding.Default.GetString(test).Split(','); // split the string into an array of 7 values
-                        //string[] values = System.Text.Encoding.Default.GetString(test).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim()).ToArray();
-                        Debug.Log(values);
-
-                        double value = double.Parse(values[6]);
-                        calibrationValuesList.Add(value);
-                        Debug.Log("Value " + ": " + value);
-                    }
-                }
-
+                // Get filtered value
+                double filteredValue = dataProcessor.GetFilteredValue(6);
+                calibrationValuesList.Add(filteredValue);
+                //Debug.Log("Value " + ": " + value);
                 yield return null;
             }
             // calculate the calibration voltages
@@ -119,20 +106,8 @@ public class RotateAroundLocalYAxis6 : MonoBehaviour
                 Debug.Log("Running concurrent task...");
 
                 //
-                using (var fileStream = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
-                {
-                    using (var memoryStream = new MemoryStream())
-                    {
-                        fileStream.CopyTo(memoryStream);
-                        byte[] test = memoryStream.ToArray();
-                        string[] values = System.Text.Encoding.Default.GetString(test).Split(','); // split the string into an array of values
-                        //string[] values = System.Text.Encoding.Default.GetString(test).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim()).ToArray();
-
-                        double value = double.Parse(values[6]);
-                        calibrationValuesList.Add(value);
-                        Debug.Log("Value " + ": " + value);
-                    }
-                }
+                double filteredValue = dataProcessor.GetFilteredValue(6);
+                calibrationValuesList.Add(filteredValue);
 
                 yield return null;
             }
@@ -164,20 +139,7 @@ public class RotateAroundLocalYAxis6 : MonoBehaviour
 
         if (selfsensingTesting == true)
         {
-            using (var fileStream = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
-            {
-                using (var memoryStream = new MemoryStream())
-                {
-                    fileStream.CopyTo(memoryStream);
-                    byte[] test = memoryStream.ToArray();
-                    measuredValue = System.Text.Encoding.Default.GetString(test);
-                    //string[] values = System.Text.Encoding.Default.GetString(test).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim()).ToArray();
-                }
-            }
-            // Split the string into 7 values and parse them to floats
-            string[] values = measuredValue.Split(',');
-
-            float floatValues = float.Parse(values[6]);
+            float floatValues = (float)dataProcessor.GetFilteredValue(6);
             float vectorRotation = (floatValues - voltageOffsetEstim) * voltagetoDegEstim;
 
 
@@ -188,20 +150,8 @@ public class RotateAroundLocalYAxis6 : MonoBehaviour
         }
         if (calibrated == true && !legs_calibration_active)
         {
-            using (var fileStream = File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.ReadWrite))
-            {
-                using (var memoryStream = new MemoryStream())
-                {
-                    fileStream.CopyTo(memoryStream);
-                    byte[] test = memoryStream.ToArray();
-                    measuredValue = System.Text.Encoding.Default.GetString(test);
-                    //Debug.Log((float.Parse(measuredValue) * 100).ToString());
-                    //string[] values = System.Text.Encoding.Default.GetString(test).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(v => v.Trim()).ToArray();
-                }
-            }
-            string[] values = measuredValue.Split(',');
             //Get values 3-5
-            float floatValues = float.Parse(values[6]);
+            float floatValues = (float)dataProcessor.GetFilteredValue(6);
             //Debug.Log("floatValues " + floatValues);
             //Debug.Log("vectorRotation: " + ((floatValues - calibrationVoltage1) / (calibrationVoltage2 - calibrationVoltage1)));
             //if(calibrationVoltage1 - calibrationVoltage2 == 0)
@@ -214,7 +164,6 @@ public class RotateAroundLocalYAxis6 : MonoBehaviour
             Vector3 to = new Vector3(0, vectorRotation, 0);
 
             transform.localEulerAngles = to;
-
         }
 
     }

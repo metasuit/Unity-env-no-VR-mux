@@ -506,6 +506,7 @@ MonoBehaviour:
   startTorsoCalibrationButton: {fileID: 693969681}
   startApplicationButton: {fileID: 1817073004}
   startLegCalibrationButton: {fileID: 1625460828}
+  dataProcessor: {fileID: 1905353598}
 --- !u!1 &149159136
 GameObject:
   m_ObjectHideFlags: 0
@@ -976,6 +977,7 @@ MonoBehaviour:
   startLegsCalibrationButton: {fileID: 1625460828}
   startTorsoCalibrationButton: {fileID: 693969681}
   startApplicationButton: {fileID: 1817073004}
+  dataProcessor: {fileID: 1905353598}
 --- !u!1 &640452575
 GameObject:
   m_ObjectHideFlags: 0
@@ -1789,6 +1791,7 @@ MonoBehaviour:
   startLegsCalibrationButton: {fileID: 1625460828}
   startTorsoCalibrationButton: {fileID: 693969681}
   startApplicationButton: {fileID: 1817073004}
+  dataProcessor: {fileID: 1905353598}
 --- !u!1 &1076211748
 GameObject:
   m_ObjectHideFlags: 0
@@ -3021,6 +3024,53 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1817073002}
   m_CullTransparentMesh: 1
+--- !u!1 &1905353597
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1905353599}
+  - component: {fileID: 1905353598}
+  m_Layer: 0
+  m_Name: DataProcessorObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1905353598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1905353597}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c5c7b6c9d930774d88167e1db0ee970, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fileName: C:\tmp\values_muxes.txt
+  bufferSize: 5
+  dataSize: 7
+--- !u!4 &1905353599
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1905353597}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 713.7596, y: 328.69986, z: 445.04132}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 11
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1955159898
 GameObject:
   m_ObjectHideFlags: 0
