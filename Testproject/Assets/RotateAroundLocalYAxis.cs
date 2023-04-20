@@ -79,7 +79,7 @@ public class RotateAroundLocalYAxis : MonoBehaviour
 
             while (Time.time < endTime)
             {
-                Debug.Log("Running concurrent task...");
+               // Debug.Log("Running concurrent task...");
 
                 // Get filtered values                
                 for(int i = 0; i < 3; i++)
