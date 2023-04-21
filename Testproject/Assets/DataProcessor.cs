@@ -185,7 +185,7 @@ public class DataProcessor : MonoBehaviour
     public double GetFilteredValue(int index)
     {
         // Return filtered value at given index
-        return filteredValues[index];
+        return array[index];
     }
 
     // Update is called once per frame
