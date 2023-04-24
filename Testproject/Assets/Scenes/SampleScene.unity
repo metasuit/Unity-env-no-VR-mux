@@ -238,8 +238,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 1
-      - m_Target: {fileID: 541854539}
-        m_TargetAssemblyTypeName: RotateAroundLocalYAxis3_5, Assembly-CSharp
+      - m_Target: {fileID: 106641262}
+        m_TargetAssemblyTypeName: RotateAroundLocalYAxis, Assembly-CSharp
         m_MethodName: RotationUpdate
         m_Mode: 0
         m_Arguments:
@@ -250,8 +250,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 1
-      - m_Target: {fileID: 106641260}
-        m_TargetAssemblyTypeName: RotateAroundLocalYAxis6, Assembly-CSharp
+      - m_Target: {fileID: 541854541}
+        m_TargetAssemblyTypeName: RotateAroundLocalYAxis, Assembly-CSharp
         m_MethodName: RotationUpdate
         m_Mode: 0
         m_Arguments:
@@ -486,7 +486,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 100092, guid: 317a56890b5c8e74ab1d492a2c7fb608, type: 3}
   m_PrefabInstance: {fileID: 1447103776}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &106641260
+--- !u!114 &106641262
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -495,18 +495,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 106641258}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b33d0224bc262f46821c461697f50c9, type: 3}
+  m_Script: {fileID: 11500000, guid: fdfb4e707abdd1c4eadb3876078b31b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   selfsensingTesting: 0
   calibrationTime: 2
+  numberOfHasels: 1
+  firstHaselIndex: 1
   calibrateButton1: {fileID: 53609216}
   calibrateButton2: {fileID: 646526270}
   calibrationSlider: {fileID: 8906257}
-  startApplicationButton: {fileID: 1817073004}
   startCalibrationButton: {fileID: 1625460828}
+  startApplicationButton: {fileID: 1817073004}
   dataProcessor: {fileID: 1905353598}
-  spineToggle: {fileID: 1482077958}
+  bodyPartToggle: {fileID: 1482077958}
 --- !u!1 &149159136
 GameObject:
   m_ObjectHideFlags: 0
@@ -1033,7 +1035,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 100206, guid: 317a56890b5c8e74ab1d492a2c7fb608, type: 3}
   m_PrefabInstance: {fileID: 1447103776}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &541854539
+--- !u!114 &541854541
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1042,19 +1044,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 541854537}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 527b289e29f27fe47a10849fdb2f91d8, type: 3}
+  m_Script: {fileID: 11500000, guid: fdfb4e707abdd1c4eadb3876078b31b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   selfsensingTesting: 0
   calibrationTime: 2
-  numberOfHasels: 1
+  numberOfHasels: 3
+  firstHaselIndex: 4
   calibrateButton1: {fileID: 53609216}
   calibrateButton2: {fileID: 646526270}
   calibrationSlider: {fileID: 8906257}
   startCalibrationButton: {fileID: 1625460828}
   startApplicationButton: {fileID: 1817073004}
   dataProcessor: {fileID: 1905353598}
-  rightLegToggle: {fileID: 1154046754}
+  bodyPartToggle: {fileID: 1154046754}
 --- !u!1 &640452575
 GameObject:
   m_ObjectHideFlags: 0
@@ -1745,13 +1748,14 @@ MonoBehaviour:
   selfsensingTesting: 0
   calibrationTime: 2
   numberOfHasels: 1
+  firstHaselIndex: 1
   calibrateButton1: {fileID: 53609216}
   calibrateButton2: {fileID: 646526270}
   calibrationSlider: {fileID: 8906257}
   startCalibrationButton: {fileID: 1625460828}
   startApplicationButton: {fileID: 1817073004}
   dataProcessor: {fileID: 1905353598}
-  leftLegToggle: {fileID: 1588351524}
+  bodyPartToggle: {fileID: 1588351524}
 --- !u!1 &995237339
 GameObject:
   m_ObjectHideFlags: 0
@@ -2259,7 +2263,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbbe905c9ef1eb84ba4ad201b41ab1dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  calibrationButton: {fileID: 0}
 --- !u!1001 &1447103776
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3208,8 +3211,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fef334b22c8b2c4c841412c90665c03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  color: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+  colorDefault: {r: 1, g: 1, b: 1, a: 1}
   colorActivated: {r: 0.51222587, g: 0.8396226, b: 0.368325, a: 0}
+  startApplicationButton: {fileID: 1817073004}
+  isActivated: 0
 --- !u!1 &1686888589
 GameObject:
   m_ObjectHideFlags: 0
@@ -3582,14 +3587,11 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1817073002}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 97c161745184cd74fb7506b21fcbc6ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  color: {r: 0.9607844, g: 0.9607844, b: 0.9607844, a: 0}
-  colorActivated: {r: 0.5137255, g: 0.8392157, b: 0.36862746, a: 0}
-  startCallibrationButton: {fileID: 1625460828}
 --- !u!1 &1828773491
 GameObject:
   m_ObjectHideFlags: 0

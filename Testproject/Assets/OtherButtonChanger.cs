@@ -5,23 +5,33 @@ using UnityEngine.UI;
 
 public class OtherButtonChanger : MonoBehaviour
 {
-    public Color color;
-    public Color colorActivated;
-    public Button startCallibrationButton;
+    Button button;
+    private ButtonColorChanger otherScript;
+
     // Start is called before the first frame update
     void Start()
     {
-        startCallibrationButton.onClick.AddListener(ChangeColor);
+        button = GetComponent<Button>();
+       // button.onClick.AddListener(ChangeColor);
     }
     void ChangeColor()
     {
         Debug.Log("button pressed");
-        if (startCallibrationButton.GetComponent<Image>().color == colorActivated)
+ 
+        GameObject otherGameObject = GameObject.Find("StartCalibrationButton"); // Replace "OtherGameObject" with the name of the GameObject that has the OtherScript attached to it.
+        if (otherGameObject != null)
         {
-            Debug.Log("It worked");
-            startCallibrationButton.GetComponent<Image>().color = color;
+            Button otherButton = otherGameObject.GetComponent<Button>();
+            Color newColor = Color.red; // Example color
+            ColorBlock colorBlock = otherButton.colors;
+            colorBlock.normalColor = newColor;
+            otherButton.colors = colorBlock;
         }
-        
+        else
+        {
+            Debug.Log("GameObject with name 'OtherGameObject' not found.");
+        }
+
 
     }
 }

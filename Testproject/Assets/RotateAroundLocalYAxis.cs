@@ -21,21 +21,43 @@ public class RotateAroundLocalYAxis : MonoBehaviour
     float voltagetoDegEstim = 300f;
     bool firstCalibrationDone = false;
     bool secondCalibrationDone = false;
+    bool startOfProgram = true;
+    bool measureWithOldCalibrationValues = false;
 
     public bool selfsensingTesting;
     public float calibrationTime = 2;
-    public int numberOfHasels = 1;
+    public int numberOfHasels;
+    public int firstHaselIndex;
     public Button calibrateButton1;
     public Button calibrateButton2;
     public Slider calibrationSlider;
     public Button startCalibrationButton;
     public Button startApplicationButton;
     public DataProcessor dataProcessor;
-    public Toggle leftLegToggle;
+    public Toggle bodyPartToggle;
 
     private void Start()
     {
-       
+        // Read from File
+        FileStream fileStream = new FileStream($@"C:\tmp\values_calibration-{firstHaselIndex}.txt", FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+        using (StreamReader sr = new StreamReader(fileStream))
+        {
+            string line = sr.ReadLine();
+            if (string.IsNullOrEmpty(line))
+            {
+                Debug.Log("No calibration data in file");
+
+            }
+            else
+            {
+                string[] values = line.Split(',');
+                calibrationVoltage1 = float.Parse(values[0]);
+                calibrationVoltage2 = float.Parse(values[1]);
+                calibrationAngle1 = float.Parse(values[2]);
+                calibrationAngle2 = float.Parse(values[3]); ;
+            }
+        }
+
         calibrateButton1.onClick.AddListener(ButtonClick1);
         calibrateButton2.onClick.AddListener(ButtonClick2);
         startCalibrationButton.onClick.AddListener(StartCalibration);
@@ -46,17 +68,22 @@ public class RotateAroundLocalYAxis : MonoBehaviour
         calibrated = false;
         firstCalibrationDone = false;
         secondCalibrationDone = false;
+        startOfProgram = false;
+        measureWithOldCalibrationValues = false;
     }
     void EndCalibration()
     {
         if (firstCalibrationDone && secondCalibrationDone)
         {
             calibrated = true;
+            
         }
-        else
+        else if (bodyPartToggle.isOn && startOfProgram == true)
         {
-            Console.WriteLine("Calibration didn't work");
+            measureWithOldCalibrationValues = true;
+            StartCoroutine(ChangeApplicationButtonColor());
         }
+        else Debug.Log("Calibration did not work");
 
     }
     void ButtonClick1()
@@ -71,7 +98,9 @@ public class RotateAroundLocalYAxis : MonoBehaviour
 
     IEnumerator CalibratePos1()
     {
-        if (calibrated == false && leftLegToggle.isOn)
+        startOfProgram = false;
+        measureWithOldCalibrationValues = false;
+        if (calibrated == false && bodyPartToggle.isOn)
         {
 
             calibrationAngle1 = calibrationSlider.value;
@@ -90,7 +119,7 @@ public class RotateAroundLocalYAxis : MonoBehaviour
                 // Get filtered values                
                 for(int i = 0; i < numberOfHasels; i++)
                 {
-                    double filteredValue = dataProcessor.GetFilteredValue(i);
+                    double filteredValue = dataProcessor.GetFilteredValue(i+firstHaselIndex-1);
                     calibrationValuesLists[i].Add(filteredValue); // add the value to the corresponding list
                 }
                 
@@ -114,7 +143,7 @@ public class RotateAroundLocalYAxis : MonoBehaviour
   
     IEnumerator CalibratePos2()
     {
-        if (calibrated == false && leftLegToggle.isOn)
+        if (calibrated == false && bodyPartToggle.isOn)
         {
 
             calibrationAngle2 = calibrationSlider.value;
@@ -133,7 +162,7 @@ public class RotateAroundLocalYAxis : MonoBehaviour
                 // Get filtered values                
                 for (int i = 0; i < numberOfHasels; i++)
                 {
-                    double filteredValue = dataProcessor.GetFilteredValue(i);
+                    double filteredValue = dataProcessor.GetFilteredValue(i+firstHaselIndex-1);
                     calibrationValuesLists[i].Add(filteredValue); // add the value to the corresponding list
                 }
 
@@ -162,6 +191,7 @@ public class RotateAroundLocalYAxis : MonoBehaviour
         }
 
     }
+
     IEnumerator ChangeButtonColor1()
     {
         calibrateButton1.GetComponent<Image>().color = Color.green;
@@ -174,6 +204,17 @@ public class RotateAroundLocalYAxis : MonoBehaviour
         calibrateButton2.GetComponent<Image>().color = Color.green;
         yield return new WaitForSeconds(0.1f); // Wait for 0.1 second
         calibrateButton2.GetComponent<Image>().color = Color.white; // Change the color back to white
+
+        List<double> calibrationList = new List<double>();
+        calibrationList.Add(calibrationVoltage1);
+        calibrationList.Add(calibrationVoltage2);
+        calibrationList.Add(calibrationAngle1);
+        calibrationList.Add(calibrationAngle2);
+        using (StreamWriter writer = new StreamWriter($@"C:\tmp\values_calibration-{firstHaselIndex}.txt", false))
+        {
+            string fileContent = string.Join(",", calibrationList);
+            writer.Write(fileContent);
+        }
     }
     IEnumerator ChangeButtonColorError()
     {
@@ -185,12 +226,18 @@ public class RotateAroundLocalYAxis : MonoBehaviour
 
     }
 
+    IEnumerator ChangeApplicationButtonColor()
+    {
+        startApplicationButton.GetComponent<Image>().color = Color.yellow;
+        yield return new WaitForSeconds(0.5f); // Wait for 0.1 second
+        startApplicationButton.GetComponent<Image>().color = Color.white; // Change the color back to white
+    }
+
 
     public void RotationUpdate(System.Single value)
     {
-        if (calibrated == false && leftLegToggle.isOn)
+        if (calibrated == false && bodyPartToggle.isOn)
         {
-            
             Vector3 to = new Vector3(0, value, 0);
 
             transform.localEulerAngles = to;
@@ -201,16 +248,17 @@ public class RotateAroundLocalYAxis : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        /*
         if (selfsensingTesting == true)
         {
             float[] floatValues = new float[numberOfHasels];
             float vectorRotation = 0;
 
+           
             //Get first 3 values
             for (int i = 0; i < numberOfHasels; i++)
             {
-                floatValues[i] = (float)dataProcessor.GetFilteredValue(i);
+                floatValues[i] = (float)dataProcessor.GetFilteredValue(i+firstHaselIndex-1);
                 vectorRotation += (floatValues[i] - voltageOffsetEstim) * voltagetoDegEstim;
             }
             vectorRotation /= numberOfHasels;
@@ -220,14 +268,15 @@ public class RotateAroundLocalYAxis : MonoBehaviour
 
             transform.localEulerAngles = to;
         }
-        if(calibrated==true && leftLegToggle.isOn)
+        */
+        if (bodyPartToggle.isOn && (calibrated == true || measureWithOldCalibrationValues == true))
         {
             float[] floatValues = new float[numberOfHasels];
             float vectorRotation = 0;
             //Get first 3 values
             for (int i = 0; i < numberOfHasels; i++)
             {
-                floatValues[i] = (float)dataProcessor.GetFilteredValue(i);
+                floatValues[i] = (float)dataProcessor.GetFilteredValue(i+firstHaselIndex-1);
                 vectorRotation += ((floatValues[i] - calibrationVoltage1) / (calibrationVoltage2 - calibrationVoltage1)) * (calibrationAngle2 - calibrationAngle1) + calibrationAngle1;
             }
             vectorRotation /= numberOfHasels;
